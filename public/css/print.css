@@ -1,0 +1,103 @@
+body { margin: 0; background: #e5e7eb; font-family: Arial, Helvetica, sans-serif; color: #111; }
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  background: #1f2937;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+.toolbar button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.toolbar span { font-size: 14px; }
+
+.page {
+  max-width: 800px;
+  margin: 24px auto;
+  background: #fff;
+  padding: 28px 36px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.letterhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.letterhead img { height: 42px; }
+.letterhead h1 { font-size: 20px; margin: 0; font-family: Arial Black, Arial, sans-serif; }
+.letterhead .form-id { font-size: 12px; color: #555; text-align: right; }
+
+.doc-date { margin: 8px 0; font-weight: bold; }
+
+.parties { display: flex; justify-content: space-between; gap: 24px; margin: 8px 0 12px; }
+.party { flex: 1; }
+.party strong.role { font-weight: bold; display: block; margin-bottom: 2px; }
+
+h3.section-title {
+  font-size: 12px;
+  margin: 10px 0 4px;
+  border-bottom: 1px solid #999;
+  padding-bottom: 2px;
+}
+
+.field-line { margin: 2px 0; }
+.field-line .fill { border-bottom: 1px solid #000; display: inline-block; min-width: 160px; padding: 0 3px; }
+
+.check-box {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 1.3px solid #000;
+  margin-right: 5px;
+  position: relative;
+  vertical-align: middle;
+  top: -1px;
+}
+.check-box.checked::after {
+  content: '\2713';
+  position: absolute;
+  left: 1px;
+  top: -5px;
+  font-size: 11px;
+  font-weight: bold;
+}
+.check-item { margin-right: 16px; white-space: nowrap; display: inline-block; margin-bottom: 4px; }
+
+table.cost-table { width: 100%; border-collapse: collapse; margin: 6px 0 3px; font-size: 11px; }
+table.cost-table th, table.cost-table td { border: 1px solid #999; padding: 3px 7px; text-align: left; }
+table.cost-table th { background: #f3f4f6; }
+table.cost-table td.amount, table.cost-table th.amount { text-align: right; }
+table.cost-table tr.total-row td { font-weight: bold; border-top: 2px solid #333; }
+
+.disclaimer p { margin: 3px 0; }
+.disclaimer ul { margin: 2px 0; padding-left: 16px; }
+.disclaimer li { margin: 1px 0; }
+
+.signature-block { display: flex; justify-content: space-between; gap: 24px; margin-top: 14px; }
+.signature-block .party { border-top: 1px solid #000; padding-top: 3px; }
+.signature-box { height: 36px; border-bottom: 1px solid #000; margin: 2px 0 4px; }
+
+/* Everything above is sized to land on exactly one printed A4 page for the
+   typical amount of quotation text - if a job's notes are unusually long,
+   the browser's print engine will still overflow to a second page rather
+   than truncate content, since CSS can't force-fit arbitrary text. */
+@media print {
+  body { background: #fff; }
+  .toolbar { display: none; }
+  .page { box-shadow: none; margin: 0; max-width: none; padding: 0; }
+}
+
+@page {
+  size: A4;
+  margin: 0.35in;
+}

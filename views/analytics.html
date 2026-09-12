@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics - Luxtronic Service</title>
+<link rel="icon" type="image/png" href="/images/logo.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="header">
+  <div class="logo-container">
+    <img src="/images/logo.png" alt="Luxtronic" class="logo-img">
+    <a href="/" class="brand-name">LUXTRONIC</a>
+    <span class="tagline">Service Form</span>
+  </div>
+  <div class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon" id="themeIcon"></i></div>
+</header>
+<nav class="nav-bar">
+  <a href="/" class="nav-item"><i class="fas fa-gauge-high"></i><span class="nav-text">Dashboard</span></a>
+  <a href="/records" class="nav-item"><i class="fas fa-folder"></i><span class="nav-text">Records</span></a>
+  <a href="/analytics" class="nav-item"><i class="fas fa-chart-column"></i><span class="nav-text">Analytics</span></a>
+  <a href="/service-form" class="nav-item nav-item-accent"><i class="fas fa-plus"></i><span class="nav-text">New Service</span></a>
+</nav>
+<main>
+  <h1>Analytics</h1>
+  <p class="subtitle">Business insights across every service job (drafts excluded).</p>
+  <div id="loadError"></div>
+
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <h2>Job Status</h2>
+      <div id="statusBars"></div>
+    </div>
+    <div class="panel">
+      <h2>Top Brands</h2>
+      <div id="brandBars"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <h2>Monthly Trend (last 12 months)</h2>
+      <div id="monthlyBars"></div>
+    </div>
+    <div class="panel">
+      <h2>Busiest Days (last 30 days)</h2>
+      <div id="dayBars"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Top Models</h2>
+    <table>
+      <thead><tr><th>Model</th><th>Jobs</th><th>Share</th></tr></thead>
+      <tbody id="modelsBody"></tbody>
+    </table>
+    <div id="modelsEmpty" class="empty" style="display:none;">No data yet.</div>
+  </div>
+</main>
+<script src="/js/common.js"></script>
+<script src="/js/analytics.js"></script>
+</body>
+</html>

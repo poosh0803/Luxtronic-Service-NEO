@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Detail - Luxtronic</title>
+<link rel="icon" type="image/png" href="/images/logo.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="header">
+  <div class="logo-container">
+    <img src="/images/logo.png" alt="Luxtronic" class="logo-img">
+    <a href="/" class="brand-name">LUXTRONIC</a>
+    <span class="tagline">Service Form</span>
+  </div>
+  <div class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon" id="themeIcon"></i></div>
+</header>
+<nav class="nav-bar">
+  <a href="/" class="nav-item"><i class="fas fa-gauge-high"></i><span class="nav-text">Dashboard</span></a>
+  <a href="/records" class="nav-item"><i class="fas fa-folder"></i><span class="nav-text">Records</span></a>
+  <a href="/analytics" class="nav-item"><i class="fas fa-chart-column"></i><span class="nav-text">Analytics</span></a>
+  <a href="/service-form" class="nav-item nav-item-accent"><i class="fas fa-plus"></i><span class="nav-text">New Service</span></a>
+</nav>
+<main>
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <h1 id="pageTitle">Service Detail</h1>
+    <a class="btn btn-primary" id="printLink" href="#" target="_blank">Print Service Form</a>
+  </div>
+  <p class="subtitle" id="formSubtitle"></p>
+  <div id="loadError"></div>
+
+  <div id="detail" style="display:none;">
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0;">Service Details</h2>
+        <div class="actions-bar" style="margin-top:0;">
+          <button class="btn btn-sm" id="editBtn">Edit</button>
+          <button class="btn btn-sm btn-danger" id="deleteBtn">Delete</button>
+        </div>
+      </div>
+
+      <div id="detailsView" style="margin-top:14px;"></div>
+
+      <div id="detailsEditForm" style="display:none; margin-top:16px;">
+        <h2 style="font-size:14px; color:var(--muted);">Customer</h2>
+        <div class="field-row">
+          <div>
+            <label for="editCustomerName">Customer Name</label>
+            <input type="text" id="editCustomerName">
+          </div>
+          <div>
+            <label for="editCustomerPhone">Contact Number</label>
+            <input type="text" id="editCustomerPhone">
+          </div>
+        </div>
+
+        <h2 style="font-size:14px; color:var(--muted); margin-top:20px;">Device</h2>
+        <div class="field-row">
+          <div>
+            <label for="editServiceType">Service Type</label>
+            <select id="editServiceType">
+              <option value="new">New</option>
+              <option value="rma">RMA</option>
+              <option value="repeat">Repeat Service</option>
+            </select>
+          </div>
+          <div>
+            <label for="editLiquidDamaged">Liquid Damaged</label>
+            <select id="editLiquidDamaged">
+              <option value="false">No</option>
+              <option value="true">Yes</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div>
+            <label for="editBrand">Brand</label>
+            <input type="text" id="editBrand">
+          </div>
+          <div>
+            <label for="editModel">Model</label>
+            <input type="text" id="editModel">
+          </div>
+        </div>
+        <label for="editSerialNumber">Serial Number</label>
+        <input type="text" id="editSerialNumber">
+        <label for="editAccessoriesOther">Accessories / Other Notes</label>
+        <input type="text" id="editAccessoriesOther">
+
+        <h2 style="font-size:14px; color:var(--muted); margin-top:20px;">Issue &amp; Diagnosis</h2>
+        <label for="editIssueNotes">Reported Issue Notes</label>
+        <textarea id="editIssueNotes" rows="3"></textarea>
+        <label for="editDiagnosisNotes">Diagnosis</label>
+        <textarea id="editDiagnosisNotes" rows="4"></textarea>
+
+        <h2 style="font-size:14px; color:var(--muted); margin-top:20px;">Cost</h2>
+        <label for="editPartsBreakdown">Parts Breakdown</label>
+        <textarea id="editPartsBreakdown" rows="2"></textarea>
+        <div class="field-row">
+          <div>
+            <label for="editPartsCost">Parts Cost ($)</label>
+            <input type="number" id="editPartsCost" step="0.01" min="0">
+          </div>
+          <div>
+            <label for="editLabourCost">Labour Cost ($)</label>
+            <input type="number" id="editLabourCost" step="0.01" min="0">
+          </div>
+        </div>
+
+        <div class="actions-bar">
+          <button class="btn btn-primary" id="saveBtn">Save</button>
+          <button class="btn" id="cancelEditBtn">Cancel</button>
+        </div>
+        <div id="editError"></div>
+      </div>
+      <div id="deleteError"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Photos</h2>
+      <div class="photo-grid" id="photoGrid"></div>
+      <div class="actions-bar" style="margin-top:10px;">
+        <input type="file" id="addPhotoInput" accept="image/*" multiple style="max-width:260px;">
+        <button class="btn btn-sm" id="addPhotoBtn">Add Photo(s)</button>
+      </div>
+      <div id="photoError"></div>
+    </div>
+
+    <div class="panel" id="statusPanel">
+      <h2>Status</h2>
+      <div class="actions-bar" style="margin-top:0;">
+        <button class="btn" id="finishBtn" style="display:none;">Mark as Finished</button>
+        <button class="btn" id="reopenBtn" style="display:none;">Reopen Job</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="/js/common.js"></script>
+<script src="/js/serviceDetail.js"></script>
+</body>
+</html>

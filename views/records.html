@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Records - Luxtronic Service</title>
+<link rel="icon" type="image/png" href="/images/logo.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="header">
+  <div class="logo-container">
+    <img src="/images/logo.png" alt="Luxtronic" class="logo-img">
+    <a href="/" class="brand-name">LUXTRONIC</a>
+    <span class="tagline">Service Form</span>
+  </div>
+  <div class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon" id="themeIcon"></i></div>
+</header>
+<nav class="nav-bar">
+  <a href="/" class="nav-item"><i class="fas fa-gauge-high"></i><span class="nav-text">Dashboard</span></a>
+  <a href="/records" class="nav-item"><i class="fas fa-folder"></i><span class="nav-text">Records</span></a>
+  <a href="/analytics" class="nav-item"><i class="fas fa-chart-column"></i><span class="nav-text">Analytics</span></a>
+  <a href="/service-form" class="nav-item nav-item-accent"><i class="fas fa-plus"></i><span class="nav-text">New Service</span></a>
+</nav>
+<main>
+  <h1>Service Records</h1>
+  <p class="subtitle">Search by customer, phone, form ID, or device model.</p>
+
+  <div class="panel">
+    <div class="field-row">
+      <div>
+        <label for="searchInput">Search</label>
+        <input type="text" id="searchInput" placeholder="Name, phone, form ID, or model...">
+      </div>
+      <div>
+        <label for="dateFrom">From</label>
+        <input type="date" id="dateFrom">
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label for="dateTo">To</label>
+        <input type="date" id="dateTo">
+      </div>
+      <div></div>
+    </div>
+    <label>Status</label>
+    <div class="tab-filters" id="statusFilters">
+      <button type="button" class="tab-btn active" data-status="">All (excl. drafts)</button>
+      <button type="button" class="tab-btn" data-status="draft">Drafts</button>
+      <button type="button" class="tab-btn" data-status="started">In Progress</button>
+      <button type="button" class="tab-btn" data-status="finished">Finished</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <table>
+      <thead><tr><th>Form ID</th><th>Customer</th><th>Device</th><th>Type</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
+      <tbody id="recordsBody"></tbody>
+    </table>
+    <div id="recordsEmpty" class="empty" style="display:none;">No records found.</div>
+  </div>
+
+  <div class="actions-bar" id="pagination"></div>
+</main>
+<script src="/js/common.js"></script>
+<script src="/js/records.js"></script>
+</body>
+</html>

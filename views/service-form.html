@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Service - Luxtronic</title>
+<link rel="icon" type="image/png" href="/images/logo.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="header">
+  <div class="logo-container">
+    <img src="/images/logo.png" alt="Luxtronic" class="logo-img">
+    <a href="/" class="brand-name">LUXTRONIC</a>
+    <span class="tagline">Service Form</span>
+  </div>
+  <div class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon" id="themeIcon"></i></div>
+</header>
+<nav class="nav-bar">
+  <a href="/" class="nav-item"><i class="fas fa-gauge-high"></i><span class="nav-text">Dashboard</span></a>
+  <a href="/records" class="nav-item"><i class="fas fa-folder"></i><span class="nav-text">Records</span></a>
+  <a href="/analytics" class="nav-item"><i class="fas fa-chart-column"></i><span class="nav-text">Analytics</span></a>
+  <a href="/service-form" class="nav-item nav-item-accent"><i class="fas fa-plus"></i><span class="nav-text">New Service</span></a>
+</nav>
+<main style="max-width:720px;">
+  <div id="loadError"></div>
+
+  <div id="wizard" style="display:none;">
+    <div class="wizard-progress" id="progressLabel">Step 1 of 12</div>
+    <div class="wizard-progress-track"><div class="wizard-progress-fill" id="progressFill" style="width:8%;"></div></div>
+
+    <form id="wizardForm">
+      <!-- Step 1: customer name + phone -->
+      <div class="wizard-step" data-step="1">
+        <div class="panel">
+          <div class="wizard-question">Who's this job for?</div>
+          <div class="wizard-hint">Customer's name and best contact number.</div>
+          <label for="customerName">Customer Name</label>
+          <input type="text" id="customerName" placeholder="e.g. John Smith">
+          <label for="customerPhone">Contact Number</label>
+          <input type="tel" id="customerPhone" placeholder="e.g. 0400 000 000">
+        </div>
+      </div>
+
+      <!-- Step 2: service type -->
+      <div class="wizard-step" data-step="2">
+        <div class="panel">
+          <div class="wizard-question">What type of service is this?</div>
+          <div class="choice-grid" id="serviceTypeChoices">
+            <button type="button" class="choice-btn" data-value="new"><i class="fas fa-star"></i>New</button>
+            <button type="button" class="choice-btn" data-value="rma"><i class="fas fa-rotate-left"></i>RMA</button>
+            <button type="button" class="choice-btn" data-value="repeat"><i class="fas fa-clock-rotate-left"></i>Repeat Service</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: brand + model -->
+      <div class="wizard-step" data-step="3">
+        <div class="panel">
+          <div class="wizard-question">What's the device?</div>
+          <label for="brand">Brand</label>
+          <select id="brand">
+            <option value="" disabled selected>Select a brand</option>
+            <option>Apple</option>
+            <option>Acer</option>
+            <option>Asus</option>
+            <option>Dell</option>
+            <option>HP</option>
+            <option>Lenovo</option>
+            <option>Microsoft</option>
+            <option>MSI</option>
+            <option>Samsung</option>
+            <option>Toshiba</option>
+            <option>Other</option>
+          </select>
+          <label for="model">Model</label>
+          <input type="text" id="model" placeholder="e.g. XPS 15">
+        </div>
+      </div>
+
+      <!-- Step 4: serial + liquid damage -->
+      <div class="wizard-step" data-step="4">
+        <div class="panel">
+          <div class="wizard-question">Serial number and liquid damage?</div>
+          <label for="serialNumber">Serial Number</label>
+          <input type="text" id="serialNumber" placeholder="e.g. SN-12345">
+          <label>Liquid Damaged</label>
+          <div class="choice-grid" id="liquidChoices">
+            <button type="button" class="choice-btn" data-value="true"><i class="fas fa-droplet"></i>Yes</button>
+            <button type="button" class="choice-btn" data-value="false"><i class="fas fa-ban"></i>No</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: accessories -->
+      <div class="wizard-step" data-step="5">
+        <div class="panel">
+          <div class="wizard-question">Any accessories received with it?</div>
+          <div class="wizard-hint">Tap all that apply.</div>
+          <div class="choice-grid" id="accessoryChoices">
+            <button type="button" class="choice-btn" data-value="charger"><i class="fas fa-plug"></i>Charger</button>
+            <button type="button" class="choice-btn" data-value="usb_drive"><i class="fas fa-hard-drive"></i>USB Drive / HDD</button>
+            <button type="button" class="choice-btn" data-value="other"><i class="fas fa-box"></i>Other</button>
+          </div>
+          <label for="accessoriesOther">Other accessory details (optional)</label>
+          <input type="text" id="accessoriesOther" placeholder="e.g. Carry bag">
+        </div>
+      </div>
+
+      <!-- Step 6: reported issues -->
+      <div class="wizard-step" data-step="6">
+        <div class="panel">
+          <div class="wizard-question">What's the reported issue?</div>
+          <div class="wizard-hint">Tap all that apply.</div>
+          <div class="choice-grid" id="issueChoices">
+            <button type="button" class="choice-btn" data-value="no_display"><i class="fas fa-tv"></i>No Display</button>
+            <button type="button" class="choice-btn" data-value="no_charging"><i class="fas fa-battery-empty"></i>No Charging</button>
+            <button type="button" class="choice-btn" data-value="no_post"><i class="fas fa-power-off"></i>No Post</button>
+            <button type="button" class="choice-btn" data-value="blue_screen"><i class="fas fa-triangle-exclamation"></i>Blue Screen</button>
+            <button type="button" class="choice-btn" data-value="overheating"><i class="fas fa-temperature-full"></i>Overheating</button>
+            <button type="button" class="choice-btn" data-value="fan_clean"><i class="fas fa-fan"></i>Needs Fan Clean</button>
+            <button type="button" class="choice-btn" data-value="network"><i class="fas fa-wifi"></i>Network Related</button>
+            <button type="button" class="choice-btn" data-value="os"><i class="fas fa-desktop"></i>OS Issue</button>
+            <button type="button" class="choice-btn" data-value="other"><i class="fas fa-ellipsis"></i>Other</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 7: issue notes -->
+      <div class="wizard-step" data-step="7">
+        <div class="panel">
+          <div class="wizard-question">Anything else about the issue?</div>
+          <div class="wizard-hint">Optional - in the customer's own words if useful.</div>
+          <label for="issueNotes">Issue Notes</label>
+          <textarea id="issueNotes" rows="4" placeholder="e.g. Started after a Windows update last week"></textarea>
+        </div>
+      </div>
+
+      <!-- Step 8: diagnosis -->
+      <div class="wizard-step" data-step="8">
+        <div class="panel">
+          <div class="wizard-question">What did you find?</div>
+          <div class="wizard-hint">Your diagnosis, in plain language - this prints on the customer's quotation.</div>
+          <label for="diagnosisNotes">Diagnosis</label>
+          <textarea id="diagnosisNotes" rows="5" placeholder="e.g. Faulty display cable, needs replacement"></textarea>
+        </div>
+      </div>
+
+      <!-- Step 9: parts cost -->
+      <div class="wizard-step" data-step="9">
+        <div class="panel">
+          <div class="wizard-question">Parts needed and cost?</div>
+          <label for="partsBreakdown">Parts Breakdown</label>
+          <textarea id="partsBreakdown" rows="3" placeholder="e.g. Display cable x1 - $45"></textarea>
+          <label for="partsCost">Parts Cost ($)</label>
+          <input type="number" id="partsCost" step="0.01" min="0" placeholder="0.00">
+        </div>
+      </div>
+
+      <!-- Step 10: labour cost -->
+      <div class="wizard-step" data-step="10">
+        <div class="panel">
+          <div class="wizard-question">Labour cost?</div>
+          <label for="labourCost">Labour Cost ($)</label>
+          <input type="number" id="labourCost" step="0.01" min="0" placeholder="0.00">
+          <div class="cost-summary total">
+            <span>Total Quote</span>
+            <span id="liveTotal">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 11: photos -->
+      <div class="wizard-step" data-step="11">
+        <div class="panel">
+          <div class="wizard-question">Any photos to attach?</div>
+          <div class="wizard-hint">Optional - device condition, damage, etc.</div>
+          <input type="file" id="photoInput" accept="image/*" multiple>
+          <div class="photo-grid" id="photoGrid"></div>
+        </div>
+      </div>
+
+      <!-- Step 12: review -->
+      <div class="wizard-step" data-step="12">
+        <div class="panel">
+          <div class="wizard-question">Review before submitting</div>
+          <div id="reviewContent"></div>
+        </div>
+      </div>
+    </form>
+
+    <div id="wizardError"></div>
+
+    <div class="wizard-nav">
+      <button type="button" class="btn" id="backBtn">Back</button>
+      <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+      <button type="button" class="btn btn-primary" id="submitBtn" style="display:none;">Submit Service Form</button>
+    </div>
+  </div>
+</main>
+<script src="/js/common.js"></script>
+<script src="/js/serviceForm.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Quotation</title>
+<link rel="icon" type="image/png" href="/images/logo.png">
+<link rel="stylesheet" href="/css/print.css">
+</head>
+<body>
+<div class="toolbar">
+  <span id="toolbarStatus">Loading...</span>
+  <button onclick="window.print()">Print</button>
+</div>
+
+<div class="page" id="page">
+  <div class="letterhead">
+    <img src="/images/logo.png" alt="Luxtronic">
+    <h1>Service Quotation</h1>
+    <div class="form-id">
+      Form <span id="formId"></span><br>
+      Date: <span id="formDate"></span>
+    </div>
+  </div>
+
+  <div class="parties">
+    <div class="party">
+      <strong class="role">Customer</strong>
+      <div class="field-line">Name: <span class="fill" id="customerName"></span></div>
+      <div class="field-line">Phone: <span class="fill" id="customerPhone"></span></div>
+    </div>
+    <div class="party">
+      <strong class="role">Service Provider</strong>
+      <div class="field-line" id="businessName"></div>
+      <div class="field-line" id="businessAddress"></div>
+      <div class="field-line">Ph: <span id="businessPhone"></span></div>
+      <div class="field-line">Email: <span id="businessEmail"></span></div>
+    </div>
+  </div>
+
+  <h3 class="section-title">Device Details</h3>
+  <div class="field-line">Service Type: <span class="fill" id="serviceType"></span></div>
+  <div class="field-line">Brand / Model: <span class="fill" id="brandModel"></span></div>
+  <div class="field-line">Serial Number: <span class="fill" id="serialNumber"></span></div>
+  <div class="field-line">
+    Liquid Damaged: <span class="check-item"><span class="check-box" id="checkLiquidYes"></span>Yes</span>
+    <span class="check-item"><span class="check-box" id="checkLiquidNo"></span>No</span>
+  </div>
+  <div class="field-line" id="accessoriesLine"></div>
+
+  <h3 class="section-title">Reported Issue</h3>
+  <p id="reportedIssues"></p>
+  <p id="issueNotes"></p>
+
+  <h3 class="section-title">Diagnosis</h3>
+  <p id="diagnosisNotes"></p>
+
+  <h3 class="section-title">Quotation</h3>
+  <table class="cost-table">
+    <thead><tr><th>Item</th><th class="amount">Amount</th></tr></thead>
+    <tbody>
+      <tr><td id="partsBreakdownCell">Parts</td><td class="amount" id="partsCostCell"></td></tr>
+      <tr><td>Labour</td><td class="amount" id="labourCostCell"></td></tr>
+      <tr class="total-row"><td>Total</td><td class="amount" id="totalCostCell"></td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:11px; color:#555;">This is a quotation, not a tax invoice. A receipt will be issued separately upon payment.</p>
+
+  <h3 class="section-title">Terms &amp; Disclaimer</h3>
+  <div class="disclaimer">
+    <p><strong>[Placeholder - replace with the shop's actual terms before using this for a real customer.]</strong></p>
+    <ul>
+      <li>The customer authorises Luxtronic to proceed with the diagnosis/repair described above at the quoted cost.</li>
+      <li>The quoted price is an estimate based on the diagnosis at the time of write-up; the customer will be informed of and asked to approve any additional cost before further work proceeds.</li>
+      <li>Luxtronic is not responsible for data loss during the repair process - the customer is responsible for backing up their data beforehand.</li>
+      <li>Devices not collected within [X] days of being notified as ready may incur a storage fee.</li>
+      <li>Luxtronic collects the personal information above only to manage this service job, consistent with the Privacy Act 1988 (Cth) and the Australian Privacy Principles.</li>
+    </ul>
+  </div>
+
+  <div class="signature-block">
+    <div class="party">
+      <div>Customer Signature (approval to proceed)</div>
+      <div class="signature-box"></div>
+      <div class="field-line">Date: ___________________________</div>
+    </div>
+    <div class="party">
+      <div>Technician</div>
+      <div class="signature-box"></div>
+      <div class="field-line">Date: ___________________________</div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script src="/js/printForm.js"></script>
+</body>
+</html>
