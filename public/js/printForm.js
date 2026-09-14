@@ -44,6 +44,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('partsCostCell').textContent = formatMoney(form.parts_cost);
     document.getElementById('labourCostCell').textContent = formatMoney(form.labour_cost);
     document.getElementById('totalCostCell').textContent = formatMoney(form.total_cost);
+
+    const disclaimerPoints = (config.SERVICE_FORM_DISCLAIMER || '')
+      .split('|')
+      .map((point) => point.trim())
+      .filter(Boolean);
+    document.getElementById('disclaimerList').innerHTML = disclaimerPoints.length
+      ? disclaimerPoints
+          .map((point) => {
+            const isNotice = point.startsWith('[') && point.endsWith(']');
+            return `<li class="${isNotice ? 'notice' : ''}">${escapeHtml(isNotice ? point.slice(1, -1) : point)}</li>`;
+          })
+          .join('')
+      : '<li>No terms configured - set SERVICE_FORM_DISCLAIMER in .env.</li>';
   } catch (err) {
     status.textContent = `Error: ${err.message}`;
   }

@@ -43,6 +43,11 @@ body { margin: 0; background: #e5e7eb; font-family: Arial, Helvetica, sans-serif
 .party { flex: 1; }
 .party strong.role { font-weight: bold; display: block; margin-bottom: 2px; }
 
+/* Customer has fewer lines than Service Provider (2 vs 4), which left a
+   block of empty space under it - enlarged so both columns read as
+   similarly "full" instead of one trailing off into blank space. */
+.party-customer .field-line { font-size: 15px; margin: 10px 0; }
+
 h3.section-title {
   font-size: 12px;
   margin: 10px 0 4px;
@@ -51,7 +56,7 @@ h3.section-title {
 }
 
 .field-line { margin: 2px 0; }
-.field-line .fill { border-bottom: 1px solid #000; display: inline-block; min-width: 160px; padding: 0 3px; }
+.field-line .fill { border-bottom: 1px solid #000; display: inline-block; min-width: 160px; padding: 0 3px; font-size: 14px; font-weight: bold; }
 
 .check-box {
   display: inline-block;
@@ -79,13 +84,20 @@ table.cost-table th { background: #f3f4f6; }
 table.cost-table td.amount, table.cost-table th.amount { text-align: right; }
 table.cost-table tr.total-row td { font-weight: bold; border-top: 2px solid #333; }
 
-.disclaimer p { margin: 3px 0; }
-.disclaimer ul { margin: 2px 0; padding-left: 16px; }
-.disclaimer li { margin: 1px 0; }
+ul.disclaimer { margin: 4px 0; padding-left: 16px; }
+ul.disclaimer li { margin: 2px 0; }
+ul.disclaimer li.notice { font-weight: bold; list-style: none; margin-left: -16px; }
 
-.signature-block { display: flex; justify-content: space-between; gap: 24px; margin-top: 14px; }
-.signature-block .party { border-top: 1px solid #000; padding-top: 3px; }
-.signature-box { height: 36px; border-bottom: 1px solid #000; margin: 2px 0 4px; }
+/* Signature section enlarged 50% (box height, label size, spacing) so it
+   reads as the prominent sign-off block it is, rather than an afterthought
+   at the bottom of the page. */
+.signature-block { display: flex; justify-content: space-between; gap: 24px; margin-top: 21px; font-size: 13px; }
+.signature-block .party { border-top: 1px solid #000; padding-top: 5px; }
+.signature-box { height: 54px; border-bottom: 1px solid #000; margin: 3px 0 6px; }
+
+/* The "Date: ___" line at the end of each signature block - enlarged
+   separately since it's easy to overlook at the original small size. */
+.signature-block .field-line { font-size: 15px; margin-top: 6px; }
 
 /* Everything above is sized to land on exactly one printed A4 page for the
    typical amount of quotation text - if a job's notes are unusually long,

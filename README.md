@@ -70,4 +70,4 @@ Luxtronic-Service-NEO/
 
 ## Before using this for a real customer
 
-The disclaimer text on the printed quotation (`views/print-form.html`) is a **placeholder** — replace it with the shop's actual terms and conditions before relying on it for a real signed approval.
+The disclaimer text on the printed quotation is a **placeholder** — set `SERVICE_FORM_DISCLAIMER` in `.env` to the shop's actual terms and conditions (pipe-separated bullet points, see `.env.example`) before relying on it for a real signed approval.

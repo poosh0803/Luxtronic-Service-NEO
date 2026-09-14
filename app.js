@@ -30,6 +30,7 @@ app.get('/api/config', (req, res) => {
     WEBSITE: process.env.WEBSITE,
     EMAIL: process.env.EMAIL,
     PHONE: process.env.PHONE,
+    SERVICE_FORM_DISCLAIMER: process.env.SERVICE_FORM_DISCLAIMER,
   });
 });
 
