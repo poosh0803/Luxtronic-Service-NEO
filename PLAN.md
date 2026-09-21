@@ -211,7 +211,7 @@ the registry can drift from what's actually running:
 | Setting | Value |
 |---|---|
 | Project slug | `luxtronic-service-neo` |
-| App `PORT` | `3003` (next free after Rental-NEO's `3002`) |
+| App `PORT` | `8004` (originally planned as `3003`; moved to the 8000+ range to match the deployed LAN server) |
 | `DB_PORT` | `5435` (next free per the registry) |
 | Postgres DB name | `luxtronic_service_neo_db` |
 | Docker Compose project name | `luxtronic-service-neo` |

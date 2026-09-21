@@ -11,7 +11,7 @@ import serviceFormRoutes from './src/routes/serviceForms.js';
 import analyticsRoutes from './src/routes/analytics.js';
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 8004;
 const __dirname = path.resolve();
 
 app.use(cors());

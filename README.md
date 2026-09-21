@@ -40,7 +40,7 @@ npm run dev   # auto-restart
 npm start     # production
 ```
 
-The app runs at http://localhost:3003.
+The app runs at http://localhost:8004.
 
 ## Project Structure
 
