@@ -26,6 +26,7 @@ function rowToForm(row) {
     ...row,
     accessories: row.accessories ?? [],
     reported_issues: row.reported_issues ?? [],
+    inspection_tests: row.inspection_tests ?? [],
   };
 }
 
@@ -174,12 +175,13 @@ router.patch('/:id', async (req, res) => {
       reported_issues: 'reported_issues',
       issue_notes: 'issue_notes',
       diagnosis_notes: 'diagnosis_notes',
+      inspection_tests: 'inspection_tests',
       parts_cost: 'parts_cost',
       labour_cost: 'labour_cost',
       parts_breakdown: 'parts_breakdown',
       wizard_step: 'wizard_step',
     };
-    const jsonFields = new Set(['accessories', 'reported_issues']);
+    const jsonFields = new Set(['accessories', 'reported_issues', 'inspection_tests']);
 
     const setClauses = [];
     const values = [];

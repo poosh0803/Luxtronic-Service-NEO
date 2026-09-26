@@ -27,7 +27,10 @@
   <div id="loadError"></div>
 
   <div id="wizard" style="display:none;">
-    <div class="wizard-progress" id="progressLabel">Step 1 of 12</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+      <div class="wizard-progress" id="progressLabel">Step 1 of 12</div>
+      <button type="button" class="btn btn-sm btn-danger" id="deleteDraftBtn">Delete Draft</button>
+    </div>
     <div class="wizard-progress-track"><div class="wizard-progress-fill" id="progressFill" style="width:8%;"></div></div>
 
     <form id="wizardForm">
@@ -142,6 +145,13 @@
         <div class="panel">
           <div class="wizard-question">What did you find?</div>
           <div class="wizard-hint">Your diagnosis, in plain language - this prints on the customer's quotation.</div>
+          <label>Tests run</label>
+          <div class="choice-grid" id="testChoices">
+            <button type="button" class="choice-btn" data-value="memtest"><i class="fas fa-memory"></i>Memtest</button>
+            <button type="button" class="choice-btn" data-value="hdd_test"><i class="fas fa-hard-drive"></i>HDD Test</button>
+            <button type="button" class="choice-btn" data-value="power_test"><i class="fas fa-bolt"></i>Power Test</button>
+            <button type="button" class="choice-btn" data-value="display_test"><i class="fas fa-eye"></i>Display Test</button>
+          </div>
           <label for="diagnosisNotes">Diagnosis</label>
           <textarea id="diagnosisNotes" rows="5" placeholder="e.g. Faulty display cable, needs replacement"></textarea>
         </div>

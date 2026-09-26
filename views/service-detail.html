@@ -92,6 +92,13 @@
         <h2 style="font-size:14px; color:var(--muted); margin-top:20px;">Issue &amp; Diagnosis</h2>
         <label for="editIssueNotes">Reported Issue Notes</label>
         <textarea id="editIssueNotes" rows="3"></textarea>
+        <label>Tests Run</label>
+        <div id="editInspectionTests" style="display:flex; flex-wrap:wrap; gap:4px 20px;">
+          <div class="checkbox-row"><input type="checkbox" id="testMemtest" value="memtest"><label for="testMemtest">Memtest</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="testHdd" value="hdd_test"><label for="testHdd">HDD Test</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="testPower" value="power_test"><label for="testPower">Power Test</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="testDisplay" value="display_test"><label for="testDisplay">Display Test</label></div>
+        </div>
         <label for="editDiagnosisNotes">Diagnosis</label>
         <textarea id="editDiagnosisNotes" rows="4"></textarea>
 

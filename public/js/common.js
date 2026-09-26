@@ -56,6 +56,13 @@ const ISSUE_LABELS = {
   other: 'Other',
 };
 
+const INSPECTION_TEST_LABELS = {
+  memtest: 'Memtest',
+  hdd_test: 'HDD Test',
+  power_test: 'Power Test',
+  display_test: 'Display Test',
+};
+
 function highlightNav() {
   const path = window.location.pathname;
   document.querySelectorAll('.nav-bar a.nav-item[href]').forEach((a) => {

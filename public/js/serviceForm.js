@@ -15,6 +15,7 @@ let formData = {
   reported_issues: [],
   issue_notes: '',
   diagnosis_notes: '',
+  inspection_tests: [],
   parts_breakdown: '',
   parts_cost: 0,
   labour_cost: 0,
@@ -39,7 +40,7 @@ function fieldsForStep(step) {
     case 7:
       return { issue_notes: formData.issue_notes };
     case 8:
-      return { diagnosis_notes: formData.diagnosis_notes };
+      return { diagnosis_notes: formData.diagnosis_notes, inspection_tests: formData.inspection_tests };
     case 9:
       return { parts_breakdown: formData.parts_breakdown, parts_cost: formData.parts_cost };
     case 10:
@@ -176,7 +177,14 @@ function renderReview() {
   );
   rows.push(section('Reported Issue', 6, row('Issues', formData.reported_issues.map((i) => ISSUE_LABELS[i] || i).join(', ') || 'None')));
   rows.push(section('Issue Notes', 7, row('Notes', formData.issue_notes)));
-  rows.push(section('Diagnosis', 8, row('Diagnosis', formData.diagnosis_notes)));
+  rows.push(
+    section(
+      'Diagnosis',
+      8,
+      row('Tests Run', formData.inspection_tests.map((t) => INSPECTION_TEST_LABELS[t] || t).join(', ') || 'None') +
+        row('Diagnosis', formData.diagnosis_notes)
+    )
+  );
   rows.push(section('Parts', 9, row('Breakdown', formData.parts_breakdown) + row('Parts Cost', formatMoney(formData.parts_cost))));
   rows.push(
     section(
@@ -199,9 +207,17 @@ function renderReview() {
   document.getElementById('reviewContent').innerHTML = rows.join('');
 }
 
+const CHOICE_GROUP_FIELDS = {
+  serviceTypeChoices: 'service_type',
+  liquidChoices: 'liquid_damaged',
+  accessoryChoices: 'accessories',
+  issueChoices: 'reported_issues',
+  testChoices: 'inspection_tests',
+};
+
 function selectChoice(groupId, value, multi) {
   const group = document.getElementById(groupId);
-  const key = groupId === 'serviceTypeChoices' ? 'service_type' : groupId === 'liquidChoices' ? 'liquid_damaged' : groupId === 'accessoryChoices' ? 'accessories' : 'reported_issues';
+  const key = CHOICE_GROUP_FIELDS[groupId];
 
   if (multi) {
     const arr = formData[key];
@@ -242,6 +258,7 @@ function populateFormFromDraft(form) {
   formData.reported_issues = form.reported_issues || [];
   formData.issue_notes = form.issue_notes || '';
   formData.diagnosis_notes = form.diagnosis_notes || '';
+  formData.inspection_tests = form.inspection_tests || [];
   formData.parts_breakdown = form.parts_breakdown || '';
   formData.parts_cost = parseFloat(form.parts_cost) || 0;
   formData.labour_cost = parseFloat(form.labour_cost) || 0;
@@ -262,6 +279,7 @@ function populateFormFromDraft(form) {
   if (formData.liquid_damaged !== null && formData.liquid_damaged !== undefined) selectChoice('liquidChoices', String(formData.liquid_damaged), false);
   formData.accessories.forEach((a) => selectChoice('accessoryChoices', a, true));
   formData.reported_issues.forEach((i) => selectChoice('issueChoices', i, true));
+  formData.inspection_tests.forEach((t) => selectChoice('testChoices', t, true));
 }
 
 async function uploadPhotos(files) {
@@ -339,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindChoiceGroup('liquidChoices', false);
   bindChoiceGroup('accessoryChoices', true);
   bindChoiceGroup('issueChoices', true);
+  bindChoiceGroup('testChoices', true);
 
   document.getElementById('nextBtn').addEventListener('click', goNext);
   document.getElementById('backBtn').addEventListener('click', goBack);
@@ -367,6 +386,18 @@ document.addEventListener('DOMContentLoaded', () => {
       await fetchJSON(`/api/service-forms/${draftId}/submit`, { method: 'POST' });
       localStorage.removeItem(DRAFT_KEY);
       window.location.href = `/service-detail?id=${draftId}`;
+    } catch (err) {
+      document.getElementById('wizardError').innerHTML = `<div class="alert alert-danger">${escapeHtml(err.message)}</div>`;
+    }
+  });
+
+  document.getElementById('deleteDraftBtn').addEventListener('click', async () => {
+    if (!draftId) return;
+    if (!confirm(`Delete this draft for "${formData.customer_name || 'this customer'}"? This cannot be undone.`)) return;
+    try {
+      await fetchJSON(`/api/service-forms/${draftId}`, { method: 'DELETE' });
+      localStorage.removeItem(DRAFT_KEY);
+      window.location.href = '/records';
     } catch (err) {
       document.getElementById('wizardError').innerHTML = `<div class="alert alert-danger">${escapeHtml(err.message)}</div>`;
     }

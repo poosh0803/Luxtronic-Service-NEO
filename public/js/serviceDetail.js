@@ -7,6 +7,7 @@ function getId() {
 function renderDetailsView(form) {
   const accessories = (form.accessories || []).map((a) => ACCESSORY_LABELS[a] || a);
   const issues = (form.reported_issues || []).map((i) => ISSUE_LABELS[i] || i);
+  const tests = (form.inspection_tests || []).map((t) => INSPECTION_TEST_LABELS[t] || t);
 
   document.getElementById('detailsView').innerHTML = `
     <div class="grid-2">
@@ -31,6 +32,7 @@ function renderDetailsView(form) {
     </div>
     <div style="margin-top:16px;">
       <h2 style="font-size:14px; color:var(--muted);">Diagnosis</h2>
+      <div><strong>Tests Run:</strong> ${tests.length ? escapeHtml(tests.join(', ')) : 'None'}</div>
       <div>${escapeHtml(form.diagnosis_notes) || '-'}</div>
     </div>
     <div style="margin-top:16px;">
@@ -97,6 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('editAccessoriesOther').value = currentForm.accessories_other || '';
     document.getElementById('editIssueNotes').value = currentForm.issue_notes || '';
     document.getElementById('editDiagnosisNotes').value = currentForm.diagnosis_notes || '';
+    document.querySelectorAll('#editInspectionTests input').forEach((box) => {
+      box.checked = (currentForm.inspection_tests || []).includes(box.value);
+    });
     document.getElementById('editPartsBreakdown').value = currentForm.parts_breakdown || '';
     document.getElementById('editPartsCost').value = currentForm.parts_cost || 0;
     document.getElementById('editLabourCost').value = currentForm.labour_cost || 0;
@@ -122,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
       accessories_other: document.getElementById('editAccessoriesOther').value.trim(),
       issue_notes: document.getElementById('editIssueNotes').value.trim(),
       diagnosis_notes: document.getElementById('editDiagnosisNotes').value.trim(),
+      inspection_tests: [...document.querySelectorAll('#editInspectionTests input:checked')].map((box) => box.value),
       parts_breakdown: document.getElementById('editPartsBreakdown').value.trim(),
       parts_cost: parseFloat(document.getElementById('editPartsCost').value) || 0,
       labour_cost: parseFloat(document.getElementById('editLabourCost').value) || 0,

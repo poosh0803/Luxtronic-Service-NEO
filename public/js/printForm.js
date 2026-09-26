@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('issueNotes').textContent = form.issue_notes || '';
 
     document.getElementById('diagnosisNotes').textContent = form.diagnosis_notes || 'Not yet diagnosed.';
+    document.querySelectorAll('[data-test]').forEach((box) => {
+      box.classList.toggle('checked', (form.inspection_tests || []).includes(box.dataset.test));
+    });
 
     document.getElementById('partsBreakdownCell').textContent = form.parts_breakdown ? `Parts - ${form.parts_breakdown}` : 'Parts';
     document.getElementById('partsCostCell').textContent = formatMoney(form.parts_cost);

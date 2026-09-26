@@ -31,7 +31,9 @@ Connect with a DB GUI at `localhost:5435`, user/password `luxtronic_user` / `lux
 cp .env.example .env
 ```
 
-The defaults in `.env.example` match the Docker setup above.
+The defaults in `.env.example` match the Docker setup above. For local development, keep
+`DB_HOST=127.0.0.1` / `DB_PORT=5435` — **never point a local `.env` at the production database**
+(`192.168.68.222:5436`), or local testing will write to live data.
 
 ### 4. Start the app
 
@@ -68,6 +70,12 @@ Luxtronic-Service-NEO/
 - **Print**: `/print-form?id=<id>` is a quotation + disclaimer for the customer to sign (physical signature), not a tax invoice — receipts/invoicing stay in Odoo.
 - **No authentication** — LAN-only trust model, same as every other Luxtronic in-house tool. Do not expose this off the shop's internal network without adding auth first.
 
-## Before using this for a real customer
+## Production
 
-The disclaimer text on the printed quotation is a **placeholder** — set `SERVICE_FORM_DISCLAIMER` in `.env` to the shop's actual terms and conditions (pipe-separated bullet points, see `.env.example`) before relying on it for a real signed approval.
+Running at `http://192.168.68.255:8004` (pm2 process `luxtronic-service-neo`), database on
+`192.168.68.222:5436`. Deployment steps, first-time DB init, and the **pre-production checklist**
+(outstanding security, backup, and data-hygiene work) are in [PLAN.md](PLAN.md#deployment).
+
+The printed terms come from `SERVICE_FORM_DISCLAIMER` in `.env` (pipe-separated bullet points).
+`.env.example` holds the shop's real terms from the paper service form; the production server's
+`.env` must be updated to match, as it still has the old placeholder.

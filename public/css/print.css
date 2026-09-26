@@ -87,6 +87,7 @@ table.cost-table tr.total-row td { font-weight: bold; border-top: 2px solid #333
 ul.disclaimer { margin: 4px 0; padding-left: 16px; }
 ul.disclaimer li { margin: 2px 0; }
 ul.disclaimer li.notice { font-weight: bold; list-style: none; margin-left: -16px; }
+.acknowledgement { font-size: 13px; font-weight: bold; margin: 10px 0 0; }
 
 /* Signature section enlarged 50% (box height, label size, spacing) so it
    reads as the prominent sign-off block it is, rather than an afterthought
