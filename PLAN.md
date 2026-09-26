@@ -234,7 +234,7 @@ production isn't Docker-managed, so each schema file is run by hand, in order. *
 | File | Production |
 |---|---|
 | `001_schema.sql` | applied 2026-09-16 |
-| `003_add_inspection_tests.sql` | **not yet applied** — run before deploying the code that uses it |
+| `003_add_inspection_tests.sql` | applied 2026-09-26 |
 
 ```bash
 psql -h 192.168.68.222 -p 5436 -U luxtronic_user -d luxtronic_service_neo_db \
@@ -257,10 +257,9 @@ Verified 2026-09-26. Items 1–5 should be done before staff rely on this for re
 
 **Must do**
 
-1. **Deploy the real terms.** The shop's paper-form terms (grammar-tidied) are now in
-   `.env.example`, but production `.env` still has the `[Placeholder …]` text. Copy the
-   `SERVICE_FORM_DISCLAIMER` line to the LAN server's `.env`, then `pm2 restart luxtronic-service-neo`.
-   The print now fits one A4 page with ~7% spare height — an unusually long diagnosis can push the
+1. ~~**Deploy the real terms.**~~ Done 2026-09-26 — production `.env` now has the shop's
+   paper-form terms (previous `.env` kept as `.env.bak-20260926` on the server). Note: the print
+   fits one A4 page with only ~7% spare height — an unusually long diagnosis can push the
    signatures onto page 2.
 2. **Harden photo uploads.** Confirmed in testing:
    - An ID like `..%2F..%2Fx` in `POST /api/service-forms/:id/photos` makes multer write the file
@@ -297,10 +296,8 @@ Verified 2026-09-26. Items 1–5 should be done before staff rely on this for re
    website opened on a shop PC can read and write this API (no auth) from that browser.
 10. **Change the production DB password.** Production uses `luxtronic_password`, the same value
     committed in `.env.example`.
-11. **Ship the pending work.** Uncommitted: the Delete Draft button, the tests checklist,
-    the acknowledgement statement, the real terms, and these doc updates. Production is also one
-    commit behind `origin/master` (the port-default change — harmless). Deploy order: run
-    `003_add_inspection_tests.sql` → `git pull` → update `.env` terms → `pm2 restart`.
+11. ~~**Ship the pending work.**~~ Done 2026-09-26 — Delete Draft, tests checklist,
+    acknowledgement statement and real terms are live (commit `6298300`).
 
 **Housekeeping**
 

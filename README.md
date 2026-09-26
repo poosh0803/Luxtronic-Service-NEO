@@ -77,5 +77,5 @@ Running at `http://192.168.68.255:8004` (pm2 process `luxtronic-service-neo`), d
 (outstanding security, backup, and data-hygiene work) are in [PLAN.md](PLAN.md#deployment).
 
 The printed terms come from `SERVICE_FORM_DISCLAIMER` in `.env` (pipe-separated bullet points).
-`.env.example` holds the shop's real terms from the paper service form; the production server's
-`.env` must be updated to match, as it still has the old placeholder.
+`.env.example` and production both hold the shop's real terms from the paper service form; edit
+the server's `.env` and `pm2 restart luxtronic-service-neo` to change them.
