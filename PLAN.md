@@ -261,14 +261,13 @@ Verified 2026-09-26. Items 1–5 should be done before staff rely on this for re
    paper-form terms (previous `.env` kept as `.env.bak-20260926` on the server). Note: the print
    fits one A4 page with only ~7% spare height — an unusually long diagnosis can push the
    signatures onto page 2.
-2. **Harden photo uploads.** Confirmed in testing:
-   - An ID like `..%2F..%2Fx` in `POST /api/service-forms/:id/photos` makes multer write the file
-     *outside* `uploads/`, before the DB insert fails.
-   - Any file type is accepted (the `accept="image/*"` is browser-side only) and served back as-is
-     from `/uploads` — an uploaded `.html` file is served as `text/html`, i.e. stored XSS.
-   - No size limit.
-   Fix: validate `:id` against `^SF-\d{4}-\d{4}$` with `router.param`, check the form exists before
-   accepting files, add a multer `fileFilter` for image MIME types and a `limits.fileSize`.
+2. ~~**Harden photo uploads.**~~ Fixed 2026-09-26 (path escape via a crafted `:id`, any file
+   type accepted and served back as HTML, no size limit). Now: `:id`/`:photoId` validated with
+   `router.param` before any handler runs; the form must exist before files are accepted; only
+   JPEG/PNG/WebP/GIF, max 15 MB each and 10 per upload; the saved extension comes from the MIME
+   type, never the client's filename; a rejected batch leaves nothing on disk; `/uploads` is served
+   with `X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox`. Both pages now
+   show the rejection message. Verified against each original attack.
 3. **Set up backups.** No `pg_dump` job exists on the LAN server, and uploaded photos live only on
    the LAN server's disk (`/root/Luxtronic-Service-NEO/uploads`). Per the privacy guidelines, a
    printed customer-approved quotation may be the only record of that approval. Schedule a daily

@@ -19,7 +19,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Uploads are user-supplied files, so serve them defensively: no MIME sniffing,
+// and a sandbox CSP so even a disguised HTML file could never run script.
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, 'uploads'), {
+    setHeaders: (res) => {
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('Content-Security-Policy', 'sandbox');
+    },
+  })
+);
 
 // Business info used on the printed quotation
 app.get('/api/config', (req, res) => {

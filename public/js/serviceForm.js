@@ -282,14 +282,19 @@ function populateFormFromDraft(form) {
   formData.inspection_tests.forEach((t) => selectChoice('testChoices', t, true));
 }
 
-async function uploadPhotos(files) {
+async function uploadPhotos(input) {
+  const errorEl = document.getElementById('wizardError');
+  errorEl.innerHTML = '';
   const fd = new FormData();
-  for (const file of files) fd.append('photos', file);
-  const res = await fetch(`/api/service-forms/${draftId}/photos`, { method: 'POST', body: fd });
-  const data = await res.json();
-  if (data.success) {
+  for (const file of input.files) fd.append('photos', file);
+  try {
+    const data = await fetchJSON(`/api/service-forms/${draftId}/photos`, { method: 'POST', body: fd });
     photos = photos.concat(data.photos);
     renderPhotoGrid();
+  } catch (err) {
+    errorEl.innerHTML = `<div class="alert alert-danger">${escapeHtml(err.message)}</div>`;
+  } finally {
+    input.value = '';
   }
 }
 
@@ -371,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('photoInput').addEventListener('change', (e) => {
-    if (e.target.files.length) uploadPhotos(e.target.files);
+    if (e.target.files.length) uploadPhotos(e.target);
   });
 
   document.getElementById('reviewContent').addEventListener('click', (e) => {

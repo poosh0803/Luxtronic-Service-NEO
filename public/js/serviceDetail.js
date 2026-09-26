@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const fd = new FormData();
       for (const file of files) fd.append('photos', file);
-      await fetch(`/api/service-forms/${getId()}/photos`, { method: 'POST', body: fd });
+      await fetchJSON(`/api/service-forms/${getId()}/photos`, { method: 'POST', body: fd });
       input.value = '';
       load();
     } catch (err) {

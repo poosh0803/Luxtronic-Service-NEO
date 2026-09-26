@@ -7,19 +7,90 @@ import { nextFormId } from '../utils/formId.js';
 
 const router = express.Router();
 
+// :id is used to build filesystem paths, so it must be validated before any
+// handler (including multer) runs - otherwise an id like "../../x" writes
+// files outside uploads/.
+const FORM_ID_PATTERN = /^SF-\d{4}-\d{4,}$/;
+router.param('id', (req, res, next, id) => {
+  if (!FORM_ID_PATTERN.test(id)) return res.status(404).json({ success: false, message: 'Service form not found' });
+  next();
+});
+router.param('photoId', (req, res, next, photoId) => {
+  if (!/^\d+$/.test(photoId)) return res.status(404).json({ success: false, message: 'Photo not found' });
+  next();
+});
+
 const UPLOAD_ROOT = path.resolve('uploads', 'service-forms');
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(UPLOAD_ROOT, String(req.params.id));
-    fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname) || '.jpg';
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+const MAX_PHOTOS_PER_UPLOAD = 10;
+const MAX_PHOTO_MB = 15;
+// The saved extension comes from this map, never from the client's filename,
+// so a file can't be stored as .html and later served as a web page.
+const PHOTO_EXTENSIONS = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+};
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const dir = path.join(UPLOAD_ROOT, req.params.id);
+      fs.mkdirSync(dir, { recursive: true });
+      cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${PHOTO_EXTENSIONS[file.mimetype]}`);
+    },
+  }),
+  limits: { fileSize: MAX_PHOTO_MB * 1024 * 1024, files: MAX_PHOTOS_PER_UPLOAD },
+  fileFilter: (req, file, cb) => {
+    if (PHOTO_EXTENSIONS[file.mimetype]) return cb(null, true);
+    const err = new Error(`"${file.originalname}" isn't a supported photo - use JPEG, PNG, WebP or GIF.`);
+    err.status = 400;
+    cb(err);
   },
 });
-const upload = multer({ storage });
+
+const UPLOAD_ERROR_MESSAGES = {
+  LIMIT_FILE_SIZE: `Each photo must be under ${MAX_PHOTO_MB} MB.`,
+  LIMIT_FILE_COUNT: `Upload up to ${MAX_PHOTOS_PER_UPLOAD} photos at a time.`,
+  LIMIT_UNEXPECTED_FILE: `Upload up to ${MAX_PHOTOS_PER_UPLOAD} photos at a time.`,
+};
+
+// Multer deletes any files it already wrote when it aborts with an error, so
+// a rejected batch leaves nothing on disk.
+function receivePhotos(req, res, next) {
+  upload.array('photos', MAX_PHOTOS_PER_UPLOAD)(req, res, (err) => {
+    if (!err) return next();
+    if (err instanceof multer.MulterError || err.status === 400) {
+      return res.status(400).json({ success: false, message: UPLOAD_ERROR_MESSAGES[err.code] || err.message });
+    }
+    console.error('Error receiving photos:', err);
+    res.status(500).json({ success: false, message: 'Failed to upload photos', error: err.message });
+  });
+}
+
+async function requireForm(req, res, next) {
+  try {
+    const { rows } = await pool.query('SELECT 1 FROM service_forms WHERE id = $1', [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ success: false, message: 'Service form not found' });
+    next();
+  } catch (error) {
+    console.error('Error checking service form:', error);
+    res.status(500).json({ success: false, message: 'Failed to upload photos', error: error.message });
+  }
+}
+
+function removeFiles(files) {
+  for (const file of files || []) {
+    try {
+      fs.unlinkSync(file.path);
+    } catch {
+      // already gone - fine
+    }
+  }
+}
 
 function rowToForm(row) {
   return {
@@ -347,21 +418,28 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Photos
-router.post('/:id/photos', upload.array('photos', 10), async (req, res) => {
+router.post('/:id/photos', requireForm, receivePhotos, async (req, res) => {
+  const files = req.files || [];
+  const client = await pool.connect();
   try {
-    const files = req.files || [];
+    await client.query('BEGIN');
     const inserted = [];
     for (const file of files) {
-      const { rows } = await pool.query(
+      const { rows } = await client.query(
         `INSERT INTO service_photos (form_id, filename, original_name) VALUES ($1, $2, $3) RETURNING id, filename, original_name`,
         [req.params.id, file.filename, file.originalname]
       );
       inserted.push(rows[0]);
     }
+    await client.query('COMMIT');
     res.status(201).json({ success: true, photos: inserted });
   } catch (error) {
+    await client.query('ROLLBACK');
+    removeFiles(files);
     console.error('Error uploading photos:', error);
     res.status(500).json({ success: false, message: 'Failed to upload photos', error: error.message });
+  } finally {
+    client.release();
   }
 });
 
