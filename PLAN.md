@@ -243,7 +243,7 @@ production isn't Docker-managed, so each schema file is run by hand, in order. *
 |---|---|
 | `001_schema.sql` | applied 2026-09-16 |
 | `003_add_inspection_tests.sql` | applied 2026-09-26 |
-| `004_add_parts_line_items.sql` | **not yet applied** — run before deploying the parts-list code. Converts each existing job's text breakdown into one line item (costs and totals unchanged) |
+| `004_add_parts_line_items.sql` | applied 2026-10-01 (backup taken first: `/root/service-neo-backup-20261001.sql` on the LAN server) |
 
 ```bash
 psql -h 192.168.68.222 -p 5436 -U luxtronic_user -d luxtronic_service_neo_db \
