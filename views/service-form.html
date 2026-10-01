@@ -157,14 +157,12 @@
         </div>
       </div>
 
-      <!-- Step 9: parts cost -->
+      <!-- Step 9: parts (line items) -->
       <div class="wizard-step" data-step="9">
         <div class="panel">
           <div class="wizard-question">Parts needed and cost?</div>
-          <label for="partsBreakdown">Parts Breakdown</label>
-          <textarea id="partsBreakdown" rows="3" placeholder="e.g. Display cable x1 - $45"></textarea>
-          <label for="partsCost">Parts Cost ($)</label>
-          <input type="number" id="partsCost" step="0.01" min="0" placeholder="0.00">
+          <div class="wizard-hint">One line per part, each with its own cost. Leave blank if no parts are needed.</div>
+          <div id="partsEditor"></div>
         </div>
       </div>
 

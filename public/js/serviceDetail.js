@@ -37,7 +37,12 @@ function renderDetailsView(form) {
     </div>
     <div style="margin-top:16px;">
       <h2 style="font-size:14px; color:var(--muted);">Cost</h2>
-      <div><strong>Parts:</strong> ${escapeHtml(form.parts_breakdown) || '-'} (${formatMoney(form.parts_cost)})</div>
+      ${
+        form.parts.length
+          ? form.parts.map((p) => `<div class="review-row"><span>${escapeHtml(p.description)}</span><span>${formatMoney(p.cost)}</span></div>`).join('')
+          : '<div><strong>Parts:</strong> None</div>'
+      }
+      <div><strong>Parts Subtotal:</strong> ${formatMoney(form.parts_cost)}</div>
       <div><strong>Labour:</strong> ${formatMoney(form.labour_cost)}</div>
       <div><strong>Total Quote:</strong> ${formatMoney(form.total_cost)}</div>
     </div>
@@ -84,7 +89,15 @@ async function load() {
   }
 }
 
+function updateEditTotal() {
+  const partsTotal = sumParts(readPartsEditor(document.getElementById('editPartsEditor')).parts);
+  const labour = parseFloat(document.getElementById('editLabourCost').value) || 0;
+  document.getElementById('editTotal').textContent = formatMoney(partsTotal + labour);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  initPartsEditor(document.getElementById('editPartsEditor'), updateEditTotal);
+  document.getElementById('editLabourCost').addEventListener('input', updateEditTotal);
   load();
 
   document.getElementById('editBtn').addEventListener('click', () => {
@@ -102,9 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#editInspectionTests input').forEach((box) => {
       box.checked = (currentForm.inspection_tests || []).includes(box.value);
     });
-    document.getElementById('editPartsBreakdown').value = currentForm.parts_breakdown || '';
-    document.getElementById('editPartsCost').value = currentForm.parts_cost || 0;
     document.getElementById('editLabourCost').value = currentForm.labour_cost || 0;
+    setPartsEditorValue(document.getElementById('editPartsEditor'), currentForm.parts);
     document.getElementById('editError').innerHTML = '';
     document.getElementById('detailsEditForm').style.display = 'block';
   });
@@ -116,6 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('saveBtn').addEventListener('click', async () => {
     const errorEl = document.getElementById('editError');
     errorEl.innerHTML = '';
+    const { parts, error: partsError } = readPartsEditor(document.getElementById('editPartsEditor'));
+    if (partsError) {
+      errorEl.innerHTML = `<div class="alert alert-danger">${escapeHtml(partsError)}</div>`;
+      return;
+    }
     const payload = {
       customer_name: document.getElementById('editCustomerName').value.trim(),
       customer_phone: document.getElementById('editCustomerPhone').value.trim(),
@@ -128,8 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
       issue_notes: document.getElementById('editIssueNotes').value.trim(),
       diagnosis_notes: document.getElementById('editDiagnosisNotes').value.trim(),
       inspection_tests: [...document.querySelectorAll('#editInspectionTests input:checked')].map((box) => box.value),
-      parts_breakdown: document.getElementById('editPartsBreakdown').value.trim(),
-      parts_cost: parseFloat(document.getElementById('editPartsCost').value) || 0,
+      parts,
       labour_cost: parseFloat(document.getElementById('editLabourCost').value) || 0,
     };
     try {

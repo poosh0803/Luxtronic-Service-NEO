@@ -108,7 +108,8 @@ CREATE TABLE service_forms (
   parts_cost DECIMAL(10,2) NOT NULL DEFAULT 0,
   labour_cost DECIMAL(10,2) NOT NULL DEFAULT 0,
   total_cost DECIMAL(10,2) NOT NULL DEFAULT 0,  -- parts_cost + labour_cost, kept as a real column (not purely computed) so a printed quote never silently reflows if cost logic changes later
-  parts_breakdown TEXT,                          -- free-text line items, same as old system
+  parts JSONB NOT NULL DEFAULT '[]',             -- line items [{"description", "cost"}]; added by 004_add_parts_line_items.sql
+  parts_breakdown TEXT,                          -- UNUSED since 004 (old free-text parts; migrated into `parts`)
 
   wizard_step INTEGER NOT NULL DEFAULT 1,        -- resume point while status = 'draft'
 
@@ -141,6 +142,10 @@ Notes:
 - `total_cost` is stored (not view-computed) since it's the number printed on a customer-signed
   quotation — it must not silently change if the cost formula changes later. Recomputed and
   re-saved server-side any time `parts_cost`/`labour_cost` change.
+- `parts_cost` is the sum of the `parts` line items, set by the server whenever `parts` is saved
+  (summed in integer cents). The API ignores any `parts_cost` or `parts_breakdown` a client sends,
+  so the stored subtotal always matches the items printed on the quote. Each item needs a
+  description (≤200 chars) and a cost ≥ 0; max 30 items.
 - Keeps the old system's year+sequence ID scheme. Instead of a stored procedure, the next number
   is issued by a single atomic upsert on `sequence_counter` (`src/utils/formId.js`). Deleted
   records leave gaps in the numbering — IDs are never reused.
@@ -162,7 +167,8 @@ record) so navigating away and back resumes at `wizard_step`.
 7. **Issue notes** — free text, optional elaboration
 8. **Tests run** (Memtest / HDD / Power / Display — from the paper form's office-use section) +
    **Diagnosis** — what the technician found, in their own words
-9. **Parts cost** + **parts breakdown** (free text line items)
+9. **Parts** — a list, one row per part with its own cost (*Add part* / × to remove), live
+   subtotal. A row with a cost but no description blocks *Next*.
 10. **Labour cost** — total auto-calculated and shown live
 11. **Photos** (optional, multiple)
 12. **Review** — every answer listed by section, each with an "Edit" link back to that step
@@ -184,8 +190,10 @@ Drafts are only reachable through the wizard (Records → Drafts filter, or Dash
   **Print Service Form** top-right, photo gallery with **Add Photo(s)**, and a Status panel with
   **Mark as Finished** / **Reopen Job**.
 - **Print / Quotation view** (`/print-form?id=…`): `@media print` page, filled from
-  `GET /api/service-forms/:id` + `GET /api/config`. Sized to fit one A4 page for normal-length
-  notes. The Terms & Disclaimer bullets come from `SERVICE_FORM_DISCLAIMER` in `.env`
+  `GET /api/service-forms/:id` + `GET /api/config`. The quotation table has one row per part,
+  then Labour, then Total. Fits one A4 page with up to ~8 parts and a couple of lines of issue
+  notes (measured 2026-09-30); beyond that it flows onto page 2, with the signature block kept
+  together. The Terms & Disclaimer bullets come from `SERVICE_FORM_DISCLAIMER` in `.env`
   (pipe-separated; a point wrapped in `[brackets]` renders bold without a bullet), followed by the
   paper form's "I UNDERSTAND AND AGREE … authorise Luxtronic Pty Ltd to proceed" statement above the
   signatures. The terms are the shop's paper-form wording, grammar-tidied (2026-09-26).
@@ -235,6 +243,7 @@ production isn't Docker-managed, so each schema file is run by hand, in order. *
 |---|---|
 | `001_schema.sql` | applied 2026-09-16 |
 | `003_add_inspection_tests.sql` | applied 2026-09-26 |
+| `004_add_parts_line_items.sql` | **not yet applied** — run before deploying the parts-list code. Converts each existing job's text breakdown into one line item (costs and totals unchanged) |
 
 ```bash
 psql -h 192.168.68.222 -p 5436 -U luxtronic_user -d luxtronic_service_neo_db \
@@ -258,9 +267,8 @@ Verified 2026-09-26. Items 1–5 should be done before staff rely on this for re
 **Must do**
 
 1. ~~**Deploy the real terms.**~~ Done 2026-09-26 — production `.env` now has the shop's
-   paper-form terms (previous `.env` kept as `.env.bak-20260926` on the server). Note: the print
-   fits one A4 page with only ~7% spare height — an unusually long diagnosis can push the
-   signatures onto page 2.
+   paper-form terms (previous `.env` kept as `.env.bak-20260926` on the server — delete it, it
+   holds the DB password).
 2. ~~**Harden photo uploads.**~~ Fixed 2026-09-26 (path escape via a crafted `:id`, any file
    type accepted and served back as HTML, no size limit). Now: `:id`/`:photoId` validated with
    `router.param` before any handler runs; the form must exist before files are accepted; only

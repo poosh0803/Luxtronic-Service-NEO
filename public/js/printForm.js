@@ -43,8 +43,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       box.classList.toggle('checked', (form.inspection_tests || []).includes(box.dataset.test));
     });
 
-    document.getElementById('partsBreakdownCell').textContent = form.parts_breakdown ? `Parts - ${form.parts_breakdown}` : 'Parts';
-    document.getElementById('partsCostCell').textContent = formatMoney(form.parts_cost);
+    const labourRow = document.getElementById('labourCostCell').parentElement;
+    (form.parts || []).forEach((part) => {
+      const tr = document.createElement('tr');
+      const desc = document.createElement('td');
+      const amount = document.createElement('td');
+      desc.textContent = part.description;
+      amount.className = 'amount';
+      amount.textContent = formatMoney(part.cost);
+      tr.append(desc, amount);
+      labourRow.before(tr);
+    });
     document.getElementById('labourCostCell').textContent = formatMoney(form.labour_cost);
     document.getElementById('totalCostCell').textContent = formatMoney(form.total_cost);
 

@@ -63,6 +63,77 @@ const INSPECTION_TEST_LABELS = {
   display_test: 'Display Test',
 };
 
+// Summed in integer cents so e.g. 0.1 + 0.2 doesn't print as $0.30000000000000004.
+function sumParts(parts) {
+  return (parts || []).reduce((cents, part) => cents + Math.round((Number(part.cost) || 0) * 100), 0) / 100;
+}
+
+// Editable parts list (one row per part: description + cost), shared by the
+// wizard and the service-detail edit form. onChange fires on every edit.
+function initPartsEditor(container, onChange) {
+  container.classList.add('parts-editor');
+  container.innerHTML = `
+    <div class="parts-rows"></div>
+    <button type="button" class="btn btn-sm parts-add"><i class="fas fa-plus"></i> Add part</button>
+    <div class="cost-summary"><span>Parts subtotal</span><span class="parts-subtotal">$0.00</span></div>`;
+
+  const changed = () => {
+    container.querySelector('.parts-subtotal').textContent = formatMoney(sumParts(readPartsEditor(container).parts));
+    if (onChange) onChange();
+  };
+  container.querySelector('.parts-add').addEventListener('click', () => {
+    addPartRow(container, { description: '', cost: '' }).querySelector('.part-desc').focus();
+    changed();
+  });
+  container.addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('.part-remove');
+    if (!removeBtn) return;
+    removeBtn.closest('.part-row').remove();
+    if (!container.querySelector('.part-row')) addPartRow(container, { description: '', cost: '' });
+    changed();
+  });
+  container.addEventListener('input', changed);
+  container._partsChanged = changed;
+  setPartsEditorValue(container, []);
+}
+
+function addPartRow(container, part) {
+  const row = document.createElement('div');
+  row.className = 'part-row';
+  row.innerHTML = `
+    <input type="text" class="part-desc" maxlength="200" placeholder="Part, e.g. Display cable" aria-label="Part description">
+    <input type="number" class="part-cost" step="0.01" min="0" inputmode="decimal" placeholder="0.00" aria-label="Part cost ($)">
+    <button type="button" class="btn part-remove" aria-label="Remove part">&times;</button>`;
+  row.querySelector('.part-desc').value = part.description || '';
+  row.querySelector('.part-cost').value = part.cost === '' || part.cost === undefined ? '' : part.cost;
+  container.querySelector('.parts-rows').appendChild(row);
+  return row;
+}
+
+function setPartsEditorValue(container, parts) {
+  container.querySelector('.parts-rows').innerHTML = '';
+  (parts.length ? parts : [{ description: '', cost: '' }]).forEach((part) => addPartRow(container, part));
+  container._partsChanged();
+}
+
+// Returns only complete rows; blank rows are ignored. `error` flags a row that
+// has a cost but no description, or a cost that isn't a valid amount.
+function readPartsEditor(container) {
+  const parts = [];
+  let error = null;
+  container.querySelectorAll('.part-row').forEach((row) => {
+    const description = row.querySelector('.part-desc').value.trim();
+    const costInput = row.querySelector('.part-cost');
+    const costText = costInput.value.trim();
+    if (!description && !costText && !costInput.validity.badInput) return;
+    const cost = costText === '' ? 0 : Number(costText);
+    if (!description) error = error || 'Each part needs a description.';
+    else if (costInput.validity.badInput || !Number.isFinite(cost) || cost < 0) error = error || `"${description}" needs a valid cost.`;
+    else parts.push({ description, cost });
+  });
+  return { parts, error };
+}
+
 function highlightNav() {
   const path = window.location.pathname;
   document.querySelectorAll('.nav-bar a.nav-item[href]').forEach((a) => {

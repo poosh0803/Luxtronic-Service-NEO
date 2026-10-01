@@ -103,18 +103,16 @@
         <textarea id="editDiagnosisNotes" rows="4"></textarea>
 
         <h2 style="font-size:14px; color:var(--muted); margin-top:20px;">Cost</h2>
-        <label for="editPartsBreakdown">Parts Breakdown</label>
-        <textarea id="editPartsBreakdown" rows="2"></textarea>
+        <label>Parts</label>
+        <div id="editPartsEditor"></div>
         <div class="field-row">
-          <div>
-            <label for="editPartsCost">Parts Cost ($)</label>
-            <input type="number" id="editPartsCost" step="0.01" min="0">
-          </div>
           <div>
             <label for="editLabourCost">Labour Cost ($)</label>
             <input type="number" id="editLabourCost" step="0.01" min="0">
           </div>
+          <div></div>
         </div>
+        <div class="cost-summary total"><span>Total Quote</span><span id="editTotal">$0.00</span></div>
 
         <div class="actions-bar">
           <button class="btn btn-primary" id="saveBtn">Save</button>

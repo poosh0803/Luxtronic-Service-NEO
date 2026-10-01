@@ -16,7 +16,7 @@ let formData = {
   issue_notes: '',
   diagnosis_notes: '',
   inspection_tests: [],
-  parts_breakdown: '',
+  parts: [],
   parts_cost: 0,
   labour_cost: 0,
 };
@@ -42,7 +42,7 @@ function fieldsForStep(step) {
     case 8:
       return { diagnosis_notes: formData.diagnosis_notes, inspection_tests: formData.inspection_tests };
     case 9:
-      return { parts_breakdown: formData.parts_breakdown, parts_cost: formData.parts_cost };
+      return { parts: formData.parts };
     case 10:
       return { labour_cost: formData.labour_cost };
     default:
@@ -73,8 +73,8 @@ function readStepInputs(step) {
       formData.diagnosis_notes = document.getElementById('diagnosisNotes').value.trim();
       break;
     case 9:
-      formData.parts_breakdown = document.getElementById('partsBreakdown').value.trim();
-      formData.parts_cost = parseFloat(document.getElementById('partsCost').value) || 0;
+      formData.parts = readPartsEditor(document.getElementById('partsEditor')).parts;
+      formData.parts_cost = sumParts(formData.parts);
       break;
     case 10:
       formData.labour_cost = parseFloat(document.getElementById('labourCost').value) || 0;
@@ -86,6 +86,7 @@ function validateStep(step) {
   if (step === 1 && !formData.customer_name) return 'Please enter the customer name.';
   if (step === 2 && !formData.service_type) return 'Please choose a service type.';
   if (step === 3 && (!formData.brand || !formData.model)) return 'Please enter both brand and model.';
+  if (step === 9) return readPartsEditor(document.getElementById('partsEditor')).error;
   return null;
 }
 
@@ -185,7 +186,14 @@ function renderReview() {
         row('Diagnosis', formData.diagnosis_notes)
     )
   );
-  rows.push(section('Parts', 9, row('Breakdown', formData.parts_breakdown) + row('Parts Cost', formatMoney(formData.parts_cost))));
+  rows.push(
+    section(
+      'Parts',
+      9,
+      (formData.parts.length ? formData.parts.map((p) => row(p.description, formatMoney(p.cost))).join('') : row('Parts', 'None')) +
+        row('Parts Subtotal', formatMoney(formData.parts_cost))
+    )
+  );
   rows.push(
     section(
       'Cost',
@@ -259,8 +267,8 @@ function populateFormFromDraft(form) {
   formData.issue_notes = form.issue_notes || '';
   formData.diagnosis_notes = form.diagnosis_notes || '';
   formData.inspection_tests = form.inspection_tests || [];
-  formData.parts_breakdown = form.parts_breakdown || '';
-  formData.parts_cost = parseFloat(form.parts_cost) || 0;
+  formData.parts = form.parts || [];
+  formData.parts_cost = sumParts(formData.parts);
   formData.labour_cost = parseFloat(form.labour_cost) || 0;
 
   document.getElementById('customerName').value = formData.customer_name;
@@ -271,8 +279,7 @@ function populateFormFromDraft(form) {
   document.getElementById('accessoriesOther').value = formData.accessories_other;
   document.getElementById('issueNotes').value = formData.issue_notes;
   document.getElementById('diagnosisNotes').value = formData.diagnosis_notes;
-  document.getElementById('partsBreakdown').value = formData.parts_breakdown;
-  document.getElementById('partsCost').value = formData.parts_cost || '';
+  setPartsEditorValue(document.getElementById('partsEditor'), formData.parts);
   document.getElementById('labourCost').value = formData.labour_cost || '';
 
   if (formData.service_type) selectChoice('serviceTypeChoices', formData.service_type, false);
@@ -367,9 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('nextBtn').addEventListener('click', goNext);
   document.getElementById('backBtn').addEventListener('click', goBack);
 
-  document.getElementById('partsCost').addEventListener('input', (e) => {
-    formData.parts_cost = parseFloat(e.target.value) || 0;
-  });
+  initPartsEditor(document.getElementById('partsEditor'), () => readStepInputs(9));
   document.getElementById('labourCost').addEventListener('input', (e) => {
     formData.labour_cost = parseFloat(e.target.value) || 0;
     updateLiveTotal();

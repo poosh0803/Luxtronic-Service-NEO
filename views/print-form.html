@@ -15,7 +15,7 @@
 
 <div class="page" id="page">
   <div class="letterhead">
-    <img src="/images/logo.png" alt="Luxtronic">
+    <div></div>
     <h1>Service Quotation</h1>
     <div class="form-id">
       Form <span id="formId"></span><br>
@@ -39,14 +39,19 @@
   </div>
 
   <h3 class="section-title">Device Details</h3>
-  <div class="field-line">Service Type: <span class="fill" id="serviceType"></span></div>
-  <div class="field-line">Brand / Model: <span class="fill" id="brandModel"></span></div>
-  <div class="field-line">Serial Number: <span class="fill" id="serialNumber"></span></div>
-  <div class="field-line">
-    Liquid Damaged: <span class="check-item"><span class="check-box" id="checkLiquidYes"></span>Yes</span>
-    <span class="check-item"><span class="check-box" id="checkLiquidNo"></span>No</span>
+  <div class="device-details">
+    <div>
+      <div class="field-line">Service Type: <span class="fill" id="serviceType"></span></div>
+      <div class="field-line">Brand / Model: <span class="fill" id="brandModel"></span></div>
+      <div class="field-line">Serial Number: <span class="fill" id="serialNumber"></span></div>
+      <div class="field-line">
+        Liquid Damaged: <span class="check-item"><span class="check-box" id="checkLiquidYes"></span>Yes</span>
+        <span class="check-item"><span class="check-box" id="checkLiquidNo"></span>No</span>
+      </div>
+      <div class="field-line" id="accessoriesLine"></div>
+    </div>
+    <img class="device-logo" src="/images/logo.png" alt="Luxtronic">
   </div>
-  <div class="field-line" id="accessoriesLine"></div>
 
   <h3 class="section-title">Reported Issue</h3>
   <p id="reportedIssues"></p>
@@ -65,8 +70,7 @@
   <h3 class="section-title">Quotation</h3>
   <table class="cost-table">
     <thead><tr><th>Item</th><th class="amount">Amount</th></tr></thead>
-    <tbody>
-      <tr><td id="partsBreakdownCell">Parts</td><td class="amount" id="partsCostCell"></td></tr>
+    <tbody id="costRows">
       <tr><td>Labour</td><td class="amount" id="labourCostCell"></td></tr>
       <tr class="total-row"><td>Total</td><td class="amount" id="totalCostCell"></td></tr>
     </tbody>

@@ -98,7 +98,36 @@ function rowToForm(row) {
     accessories: row.accessories ?? [],
     reported_issues: row.reported_issues ?? [],
     inspection_tests: row.inspection_tests ?? [],
+    parts: row.parts ?? [],
   };
+}
+
+const MAX_PARTS = 30;
+const MAX_PART_DESCRIPTION = 200;
+
+// Validates a parts list and returns it normalized (trimmed, costs rounded to
+// cents) with its total, summed in integer cents to avoid float drift.
+function parseParts(input) {
+  if (!Array.isArray(input) || input.length > MAX_PARTS) {
+    return { error: `Parts must be a list of up to ${MAX_PARTS} items.` };
+  }
+  const parts = [];
+  let totalCents = 0;
+  for (const item of input) {
+    const description = typeof item?.description === 'string' ? item.description.trim() : '';
+    const cost = Number(item?.cost);
+    if (!description) return { error: 'Each part needs a description.' };
+    if (description.length > MAX_PART_DESCRIPTION) {
+      return { error: `Part descriptions must be ${MAX_PART_DESCRIPTION} characters or fewer.` };
+    }
+    if (item?.cost === '' || item?.cost === null || !Number.isFinite(cost) || cost < 0 || cost > 1000000) {
+      return { error: `"${description}" needs a valid cost.` };
+    }
+    const cents = Math.round(cost * 100);
+    totalCents += cents;
+    parts.push({ description, cost: cents / 100 });
+  }
+  return { parts, total: totalCents / 100 };
 }
 
 // Create a new draft - the wizard calls this once, on step 1, before any
@@ -214,6 +243,18 @@ router.get('/:id', async (req, res) => {
 // Update - used both for per-step wizard auto-save and full detail edits.
 // Only fields present in the body are touched.
 router.patch('/:id', async (req, res) => {
+  // parts_cost is derived from the parts list, never set directly, so the
+  // stored subtotal always matches the line items printed on the quote.
+  const updates = { ...req.body };
+  delete updates.parts_cost;
+  delete updates.parts_breakdown;
+  if (updates.parts !== undefined) {
+    const parsed = parseParts(updates.parts);
+    if (parsed.error) return res.status(400).json({ success: false, message: parsed.error });
+    updates.parts = parsed.parts;
+    updates.parts_cost = parsed.total;
+  }
+
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -247,12 +288,12 @@ router.patch('/:id', async (req, res) => {
       issue_notes: 'issue_notes',
       diagnosis_notes: 'diagnosis_notes',
       inspection_tests: 'inspection_tests',
+      parts: 'parts',
       parts_cost: 'parts_cost',
       labour_cost: 'labour_cost',
-      parts_breakdown: 'parts_breakdown',
       wizard_step: 'wizard_step',
     };
-    const jsonFields = new Set(['accessories', 'reported_issues', 'inspection_tests']);
+    const jsonFields = new Set(['accessories', 'reported_issues', 'inspection_tests', 'parts']);
 
     const setClauses = [];
     const values = [];
@@ -265,8 +306,8 @@ router.patch('/:id', async (req, res) => {
     let labourCostExpr = 'labour_cost';
 
     for (const [key, column] of Object.entries(fieldMap)) {
-      if (body[key] === undefined) continue;
-      values.push(jsonFields.has(key) ? JSON.stringify(body[key]) : body[key]);
+      if (updates[key] === undefined) continue;
+      values.push(jsonFields.has(key) ? JSON.stringify(updates[key]) : updates[key]);
       const paramIdx = values.length;
       setClauses.push(`${column} = $${paramIdx}`);
       if (key === 'parts_cost') partsCostExpr = `$${paramIdx}`;
