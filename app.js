@@ -9,6 +9,7 @@ dotenv.config();
 
 import serviceFormRoutes from './src/routes/serviceForms.js';
 import analyticsRoutes from './src/routes/analytics.js';
+import { syncInProgressNotifications } from './src/utils/portalNotifier.js';
 
 const app = express();
 const PORT = process.env.PORT || 8004;
@@ -62,4 +63,6 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  // Never throws; a no-op unless PORTAL_NOTIFICATIONS_URL is configured.
+  syncInProgressNotifications();
 });

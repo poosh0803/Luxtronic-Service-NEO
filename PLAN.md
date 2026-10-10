@@ -244,6 +244,7 @@ production isn't Docker-managed, so each schema file is run by hand, in order. *
 | `001_schema.sql` | applied 2026-09-16 |
 | `003_add_inspection_tests.sql` | applied 2026-09-26 |
 | `004_add_parts_line_items.sql` | applied 2026-10-01 (backup taken first: `/root/service-neo-backup-20261001.sql` on the LAN server) |
+| `005_add_portal_notification_id.sql` | **not yet applied** — run before deploying the portal-notification code (the delete route reads the new column) |
 
 ```bash
 psql -h 192.168.68.222 -p 5436 -U luxtronic_user -d luxtronic_service_neo_db \
@@ -259,6 +260,29 @@ Migrations after go-live are forward-only (`ADD COLUMN IF NOT EXISTS`, safe to r
 **Local `.env` must point at the local Docker DB** (`DB_HOST=127.0.0.1`, `DB_PORT=5435`), never
 at `192.168.68.222`. If it points at production, local testing writes to and deletes from live
 data — this happened once on 2026-09-17 (only empty drafts were affected).
+
+## Portal notifications
+
+While a job is **In Progress** (`started`), the Luxtronic Portal's bell shows a "Service in
+progress" notification linking to its service-detail page (Portal API: `Luxtronic-Portal/API.md`).
+
+| Event | Portal |
+|---|---|
+| Submit (draft → started) or Reopen | notification created; its id is stored in `service_forms.portal_notification_id` |
+| Mark as Finished, or delete the job | notification removed |
+| App (re)start | any started job without a notification gets one (catches pre-existing jobs and jobs started while the portal was down) |
+
+- **Opt-in**: nothing is sent unless `PORTAL_NOTIFICATIONS_URL` is set (and `PUBLIC_BASE_URL` for the
+  link). Keep both commented out in local `.env` so tests can't post to the live portal; set them
+  only in the production `.env`.
+- **Best-effort**: calls time out after 3 s, run after the response is sent, and never throw, so a
+  down or hanging portal can't slow or break submit/finish/delete. Failures are logged with the
+  error message only (no customer details).
+- The notification text is written when the job starts; later edits to the customer/device on the
+  detail page don't update it (same as Rental-NEO). It's removed when the job finishes.
+- Production setup: add `PORTAL_NOTIFICATIONS_URL=http://192.168.68.255/api/notifications` and
+  `PUBLIC_BASE_URL=http://192.168.68.255:8004` to the LAN server's `.env`, then restart. On the
+  first start with this set, every job already in progress gets a notification at once.
 
 ## Pre-production checklist
 

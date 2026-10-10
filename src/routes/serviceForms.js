@@ -4,6 +4,7 @@ import fs from 'fs';
 import multer from 'multer';
 import pool from '../db.js';
 import { nextFormId } from '../utils/formId.js';
+import { notifyJobInProgress, releaseJobNotification, clearPortalNotification } from '../utils/portalNotifier.js';
 
 const router = express.Router();
 
@@ -370,6 +371,7 @@ router.post('/:id/submit', async (req, res) => {
       `UPDATE service_forms SET status = 'started', updated_at = now() WHERE id = $1 RETURNING *`,
       [req.params.id]
     );
+    notifyJobInProgress(req.params.id);
     res.json({ success: true, form: rowToForm(updated[0]) });
   } catch (error) {
     console.error('Error submitting service form:', error);
@@ -387,6 +389,7 @@ router.post('/:id/finish', async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: 'Service form not found' });
     }
+    releaseJobNotification(req.params.id);
     res.json({ success: true, form: rowToForm(rows[0]) });
   } catch (error) {
     console.error('Error finishing service form:', error);
@@ -404,6 +407,7 @@ router.post('/:id/reopen', async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: 'Service form not found' });
     }
+    notifyJobInProgress(req.params.id);
     res.json({ success: true, form: rowToForm(rows[0]) });
   } catch (error) {
     console.error('Error reopening service form:', error);
@@ -416,12 +420,14 @@ router.delete('/:id', async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    const existing = await client.query('SELECT customer_id FROM service_forms WHERE id = $1', [req.params.id]);
+    const existing = await client.query('SELECT customer_id, portal_notification_id FROM service_forms WHERE id = $1', [
+      req.params.id,
+    ]);
     if (existing.rows.length === 0) {
       await client.query('ROLLBACK');
       return res.status(404).json({ success: false, message: 'Service form not found' });
     }
-    const { customer_id: customerId } = existing.rows[0];
+    const { customer_id: customerId, portal_notification_id: notificationId } = existing.rows[0];
 
     const { rows: photoRows } = await client.query('SELECT filename FROM service_photos WHERE form_id = $1', [req.params.id]);
     await client.query('DELETE FROM service_forms WHERE id = $1', [req.params.id]);
@@ -448,6 +454,7 @@ router.delete('/:id', async (req, res) => {
     }
 
     await client.query('COMMIT');
+    clearPortalNotification(notificationId);
     res.json({ success: true, message: 'Service form deleted' });
   } catch (error) {
     await client.query('ROLLBACK');

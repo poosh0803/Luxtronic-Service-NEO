@@ -70,6 +70,12 @@ Luxtronic-Service-NEO/
 - **Print**: `/print-form?id=<id>` is a quotation + disclaimer for the customer to sign (physical signature), not a tax invoice — receipts/invoicing stay in Odoo.
 - **No authentication** — LAN-only trust model, same as every other Luxtronic in-house tool. Do not expose this off the shop's internal network without adding auth first.
 
+## Portal notifications
+
+In-progress jobs show on the Luxtronic Portal's notification bell. This only happens when
+`PORTAL_NOTIFICATIONS_URL` is set, so leave it commented out locally. Details in
+[PLAN.md](PLAN.md#portal-notifications).
+
 ## Production
 
 Running at `http://192.168.68.255:8004` (pm2 process `luxtronic-service-neo`), database on
