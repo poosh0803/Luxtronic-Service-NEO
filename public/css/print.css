@@ -118,13 +118,25 @@ table.cost-table tr { break-inside: avoid; }
    typical amount of quotation text - if a job's notes are unusually long,
    the browser's print engine will still overflow to a second page rather
    than truncate content, since CSS can't force-fit arbitrary text. */
+/* The safe margin is padding on .page rather than the @page margin because
+   Chrome's "Minimum" margins option throws the @page margin away and prints
+   to ~2.5 mm from the paper edge, which Brother printers clip. Padding is
+   unaffected by that setting, so Default and Minimum print identically.
+   box-decoration-break: clone repeats the padding on every printed page. */
 @media print {
   body { background: #fff; }
   .toolbar { display: none; }
-  .page { box-shadow: none; margin: 0; max-width: none; padding: 0; }
+  .page {
+    box-shadow: none;
+    margin: 0;
+    max-width: none;
+    padding: 0.35in;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
 }
 
 @page {
   size: A4;
-  margin: 0.35in;
+  margin: 0;
 }

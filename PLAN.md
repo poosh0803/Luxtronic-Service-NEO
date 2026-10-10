@@ -191,9 +191,14 @@ Drafts are only reachable through the wizard (Records → Drafts filter, or Dash
   **Mark as Finished** / **Reopen Job**.
 - **Print / Quotation view** (`/print-form?id=…`): `@media print` page, filled from
   `GET /api/service-forms/:id` + `GET /api/config`. The quotation table has one row per part,
-  then Labour, then Total. Fits one A4 page with up to ~8 parts and a couple of lines of issue
-  notes (measured 2026-09-30); beyond that it flows onto page 2, with the signature block kept
-  together. The Terms & Disclaimer bullets come from `SERVICE_FORM_DISCLAIMER` in `.env`
+  then Labour, then Total. **Print margins:** the safe margin (0.35in ≈ 9 mm) is padding on the
+  page itself, with `@page { margin: 0 }`, so output is identical whichever Margins option is
+  chosen in Chrome's print dialog (Default or Minimum). Chrome's "Minimum" discards the `@page`
+  margin and printed text ~2 mm from the edge, which Brother printers clip. Padding repeats on
+  every printed page (`box-decoration-break: clone`). Measured 2026-10-10 with real Chrome PDF
+  output and a couple of lines of issue notes: up to 8 parts fit on one A4 page on Default
+  margins and 7 on Minimum (the printer's own margin takes a few mm); beyond that the
+  acknowledgement and signatures move together to page 2. The Terms & Disclaimer bullets come from `SERVICE_FORM_DISCLAIMER` in `.env`
   (pipe-separated; a point wrapped in `[brackets]` renders bold without a bullet), followed by the
   paper form's "I UNDERSTAND AND AGREE … authorise Luxtronic Pty Ltd to proceed" statement above the
   signatures. The terms are the shop's paper-form wording, grammar-tidied (2026-09-26).
